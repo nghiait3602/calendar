@@ -1,0 +1,426 @@
+.login {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    &__title {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    &__email,
+    &__password {
+        width: 100%;
+        padding: 10px 0px 10px 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-right: 10px;
+        &--errors {
+            border: 1px solid red;
+        }
+    }
+    &__btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        &:hover {
+            background-color: #0056b3;
+        }
+    }
+    &__create {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+    }
+    &__router {
+        text-decoration: none;
+        color: #007bff;
+    }
+    &__error {
+        font-size: 10px;
+        color: red;
+    }
+}
+.calendar {
+    min-width: 1024px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    &__main {
+        width: 100%;
+        display: flex;
+        border: 1px solid #cccc;
+        .calendar__body {
+            flex: 1;
+            transition: flex 0.5s ease; /* add transition effect for smooth animation */
+        }
+        .sidebar {
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 250px;
+            gap: 20px;
+            transition: width 0.5s ease;
+            &__add {
+                width: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                margin-top: 10px;
+                margin-left: 10px;
+                padding: 10px;
+                background-color: white;
+                font-size: 18px;
+                box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+                border-radius: 50px;
+                cursor: pointer;
+            }
+            &__calendar {
+                width: 100%;
+                &-header {
+                    display: flex;
+                    &-button {
+                        margin-left: auto;
+                        .sidebar__button-previous,
+                        .sidebar__button-next {
+                            background-color: transparent;
+                            border: none;
+                            color: black;
+                            font-size: 20px;
+                            cursor: pointer;
+                            margin-right: 5px;
+                        }
+                    }
+                }
+                .calendar__small {
+                    width: 100%;
+                    .fc-view-container,
+                    .fc-scroller,
+                    .fc-timegrid-container,
+                    .fc-scrollgrid-section {
+                        overflow: hidden !important;
+                    }
+                    .fc-view-container {
+                        width: 100% !important;
+                    }
+                    .fc-daygrid-day {
+                        width: calc(
+                            100% / 7
+                        ) !important; /* Phân chia chiều rộng thành 7 phần bằng nhau cho các ngày trong tuần */
+                    }
+                    .fc-day-selected {
+                        border-radius: 50%;
+                        background-color: #007bff;
+                        color: white;
+                        padding: 0.5rem;
+                        display: inline-block;
+                    }
+                }
+            }
+            .sidebar__label {
+                width: 100%;
+                &-list {
+                    list-style: none;
+                    &__item {
+                        padding: 5px;
+                        font-size: 16px;
+                    }
+                    &__checkbox {
+                        color: #0056b3;
+                    }
+                }
+            }
+        }
+    }
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: white;
+        color: black;
+        .header__left {
+            display: flex;
+            align-items: center;
+            .header__btn {
+                margin-left: 50px;
+            }
+            .header__button {
+                background-color: transparent;
+                border: none;
+                color: black;
+                font-size: 20px;
+                cursor: pointer;
+                padding: 5px;
+                &-menu {
+                    font-size: 30px;
+                    margin-right: 10px;
+                }
+                &-today {
+                    border: 1px solid #d5d1d1;
+                    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+                    border-radius: 3px;
+                }
+                &-previous,
+                &-next {
+                    font-size: 20px;
+                    margin: 10px;
+                }
+            }
+            .header__title {
+                margin: 0 10px;
+                font-size: 30px;
+            }
+            .header__month {
+                font-size: 20px;
+            }
+            .calendar__logo {
+                width: 30px;
+                height: 30px;
+                margin-right: 10px;
+                color: black;
+            }
+        }
+        .header__right {
+            display: flex;
+            align-items: center;
+            &-btn {
+                width: 50px;
+                height: 100%;
+                position: relative;
+                &-down {
+                    width: 100px;
+                    height: 100%;
+                    position: absolute;
+                    top: 100%;
+                    right: 0;
+                    text-align: center;
+                    .logout-button {
+                        background-color: #ffffff;
+                        color: #494646cc;
+                        border: 1px solid #cccc;
+                        padding: 5px 10px;
+                        cursor: pointer;
+                        border-radius: 5px;
+                    }
+                }
+
+                .header__right-avatar {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    margin-right: 10px;
+                }
+                .logout-button:hover {
+                    background-color: #f0f0f0;
+                }
+            }
+        }
+        .header__dropdown {
+            position: relative;
+            display: inline-block;
+            margin-right: 20px;
+            .header__list {
+                padding: 8px 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                background-color: #fff;
+                cursor: pointer;
+                &:focus {
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                }
+                &-item {
+                    padding: 10px 10px;
+                    &:hover {
+                        background-color: #f0f0f0;
+                    }
+                }
+            }
+        }
+        .header__name {
+            margin: 0 10px;
+        }
+    }
+    .sidebar__none {
+        width: 0;
+        visibility: hidden;
+    }
+    .none {
+        display: none;
+    }
+}
+.fc-header-toolbar .fc-toolbar {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    &__container {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        width: 80%;
+        max-width: 500px;
+        max-height: 500px;
+        overflow: hidden;
+        &-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ccc;
+        }
+        &-body {
+            width: 100%;
+            padding: 0 10px 10px 50px;
+            .input__group {
+                display: flex;
+                justify-content: center;
+                margin: 10px 0;
+                &-title {
+                    width: 100%;
+                    padding: 10px;
+                    margin-right: 70px;
+                    border: none;
+                    border-bottom: 1px solid #ccc;
+                    font-size: 16px;
+                }
+                &-date {
+                    padding: 10px;
+                    border: none;
+                    font-size: 13px;
+                    color: #665e5ecc;
+                }
+                &-title:focus,
+                &-date:focus {
+                    border-bottom: 2px solid #007bff;
+                    outline: none;
+                }
+            }
+            .button__group {
+                display: flex;
+                gap: 10px;
+                &-event {
+                    padding: 10px;
+                    border: none;
+                    background-color: transparent;
+                    transition: background-color 0.3s ease;
+                    border-radius: 5px;
+                    &:focus {
+                        background-color: #6cb1fc;
+                    }
+                    &:hover {
+                        background-color: #007bff;
+                        color: white;
+                    }
+                }
+                &-select {
+                    background-color: #6cb1fc;
+                }
+                &-delete {
+                    background-color: red;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    cursor: pointer;
+                }
+
+                &-save {
+                    background-color: green;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    cursor: pointer;
+                }
+            }
+            .color__picker {
+                display: flex;
+                gap: 10px;
+                margin-top: 10px;
+                &-item {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    border: 2px solid transparent;
+                    cursor: pointer;
+                    outline: none;
+                    transition: border 0.3s ease;
+                }
+                &-selected {
+                    border-color: #000;
+                }
+            }
+        }
+        &-footer {
+            display: flex;
+            justify-content: flex-end;
+            text-align: center;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+            .button__group {
+                display: flex;
+                gap: 10px;
+                margin: 10px;
+                &-delete {
+                    background-color: red;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 10px 20px;
+                    cursor: pointer;
+                    &:hover {
+                        background-color: rgb(153, 67, 67);
+                    }
+                }
+                &-save {
+                    background-color: rgb(39, 131, 207);
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 10px 20px;
+                    cursor: pointer;
+                    &:hover {
+                        background-color: rgb(32, 108, 170);
+                    }
+                }
+            }
+        }
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
