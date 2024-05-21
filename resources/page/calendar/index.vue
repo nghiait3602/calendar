@@ -71,6 +71,9 @@ export default defineComponent({
             user_id: idUser.value,
         });
         watchEffect(() => {
+            if (showModal.show === false) {
+                isEdit.value = false;
+            }
             const getUser = async () => {
                 try {
                     const res = await axios.get(
@@ -181,9 +184,7 @@ export default defineComponent({
                 getDate();
             }
         });
-        // const handleWeekendsToggle = () => {
-        //     this.calendarOptions.weekends = !this.calendarOptions.weekends; // update a property
-        // };
+
         // handler Calendar
         const goToPrev = () => {
             if (fullCalendar.value) {
@@ -233,7 +234,7 @@ export default defineComponent({
                 let calendarApi = selectInfo.view.calendar;
                 calendarApi.unselect();
                 newEvent.value = {
-                    id: String(Date.now()), // Unique ID
+                    id: "", // Unique ID
                     title: "",
                     start: selectInfo.startStr,
                     end: selectInfo.endStr,
@@ -257,17 +258,9 @@ export default defineComponent({
                 end: clickInfo.event._instance.range.end,
                 allDay: clickInfo.event._def.allDay,
                 backgroundColor: clickInfo.event._def.ui.backgroundColor, // đổi màu
-
                 user_id: idUser.value,
             };
             isEdit.value = true;
-            // if (
-            //     confirm(
-            //         `Are you sure you want to delete the event '${clickInfo.event.title}'`
-            //     )
-            // ) {
-            //     clickInfo.event.remove();
-            // }
         };
         const handleEvents = (events) => {
             currentEvents.value = events;
@@ -285,7 +278,7 @@ export default defineComponent({
             },
             locale: "vi",
             initialView: "dayGridMonth",
-            editable: true,
+            editable: false,
             selectable: true,
             selectMirror: true,
             dayMaxEvents: true,

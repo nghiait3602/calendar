@@ -2,6 +2,9 @@
     <div>
         <Modal :isVisible="showModal" @close="closeModal">
             <template #body>
+                <span class="error" v-if="eventData.title === ''"
+                    >Không được để trống tiêu đề</span
+                >
                 <div class="input__group">
                     <input
                         type="text"
@@ -18,6 +21,7 @@
                         :class="{
                             'button__group-select': selectedOption === '1',
                         }"
+                        :disabled="eventData.categoris_id === '2' && isEdit"
                     >
                         Sự kiện
                     </button>
@@ -28,6 +32,7 @@
                         :class="{
                             'button__group-select': selectedOption === '2',
                         }"
+                        :disabled="eventData.categoris_id === '1' && isEdit"
                     >
                         Lời nhắc
                     </button>
@@ -54,17 +59,12 @@
                             class="input__group-date"
                         />
                         <div class="color__picker">
-                            <button
+                            <input
                                 class="color__picker-item"
-                                v-for="color in colors"
-                                :key="color"
-                                :style="{ backgroundColor: color }"
-                                :class="{
-                                    'color__picker-selected':
-                                        eventData.backgroundColor === color,
-                                }"
-                                @click="selectColor(color)"
-                            ></button>
+                                type="color"
+                                value="blue"
+                                v-model="eventData.backgroundColor"
+                            />
                         </div>
                     </div>
                 </div>
@@ -77,7 +77,6 @@
                         value="2"
                     />
                     <input
-                        style="display: none"
                         type="datetime-local"
                         v-model="eventData.start"
                         required
@@ -87,16 +86,25 @@
                         type="datetime-local"
                         v-model="eventData.end"
                         required
+                        style="display: none"
                         class="input__group-date"
                     />
                 </div>
             </template>
             <template #footer>
                 <div class="button__group">
-                    <button @click="deleteEvent" class="button__group-delete">
+                    <button
+                        @click="deleteEvent"
+                        class="button__group-delete"
+                        :disabled="eventData.id === ''"
+                    >
                         Xóa
                     </button>
-                    <button @click="create" class="button__group-save">
+                    <button
+                        @click="create"
+                        class="button__group-save"
+                        :disabled="eventData.title === ''"
+                    >
                         Lưu
                     </button>
                 </div>
@@ -118,6 +126,7 @@ export default {
         isEdit: Boolean,
     },
     setup(props, { emit }) {
+        console.log(props.isEdit);
         const show = useShowModal();
         const showModal = ref(show.show);
         const selectedOption = ref("1");
@@ -138,12 +147,17 @@ export default {
             const end = dayjs(props.event.end).format("YYYY-MM-DD");
             if (start === end) {
                 selectedOption.value = "2";
-                eventData.value.start = dayjs(props.event.end).format(
-                    "YYYY-MM-DDTHH:mm:ss"
-                );
-                eventData.value.end = dayjs(props.event.end).format(
-                    "YYYY-MM-DDTHH:mm:ss"
-                );
+                const day = new Date(props.event.end);
+                console.log(day);
+                eventData.value.start = dayjs(props.event.end)
+                    .set("hours", day.getHours())
+                    .set("minutes", day.getMinutes())
+                    .format("YYYY-MM-DDTHH:mm:ss");
+                eventData.value.end = dayjs(props.event.end)
+                    .set("hours", day.getHours())
+                    .set("minutes", day.getMinutes())
+                    .format("YYYY-MM-DDTHH:mm:ss");
+                eventData.value.categoris_id = "2";
             } else {
                 selectedOption.value = "1";
                 eventData.value.start = dayjs(props.event.start).format(
@@ -152,6 +166,7 @@ export default {
                 eventData.value.end = dayjs(props.event.end).format(
                     "YYYY-MM-DD"
                 );
+                eventData.value.categoris_id = "1";
             }
             eventData.value = {
                 ...eventData.value,
@@ -159,25 +174,21 @@ export default {
                 title: props.event.title,
                 allDay: props.event.allDay,
                 backgroundColor: props.event.backgroundColor, // đổi màu
-                categoris_id: props.event.categoris_id
-                    ? props.event.categoris_id
-                    : 1,
                 user_id: props.event.user_id,
             };
         });
 
         const updateContent = (option) => {
-            console.log(props.event.start);
-            // const dateNow = new Date
+            const today = new Date();
+            console.log(today.getHours() + today.getMinutes());
             selectedOption.value = option;
             eventData.value.categoris_id = option;
             if (selectedOption.value === "2") {
                 eventData.value.start = dayjs(props.event.start)
-                    .set("hours", 2)
+                    .set("hours", today.getHours())
                     .format("YYYY-MM-DDTHH:mm:ss");
-                console.log("eventData.value.start: ", eventData.value.start);
                 eventData.value.end = dayjs(props.event.start)
-                    .set("hours", 2)
+                    .set("hours", today.getHours())
                     .format("YYYY-MM-DDTHH:mm:ss");
             } else {
                 eventData.value.start = dayjs(props.event.start).format(

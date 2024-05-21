@@ -33,14 +33,23 @@
             </div>
         </div>
         <div class="sidebar__label">
+            <span class="sidebar__label-title">Lịch của tôi</span>
             <ul class="sidebar__label-list">
-                <li v-for="event in currentEvents" :key="event.id">
+                <li>
                     <input
                         type="checkbox"
                         checked
                         class="sidebar__label-list__checkbox"
                     />
-                    <i class="sidebar__label-list__item">{{ event.title }}</i>
+                    <i class="sidebar__label-list__item">Sự kiện</i>
+                </li>
+                <li>
+                    <input
+                        type="checkbox"
+                        checked
+                        class="sidebar__label-list__checkbox"
+                    />
+                    <i class="sidebar__label-list__item">Lời nhắc</i>
                 </li>
             </ul>
         </div>

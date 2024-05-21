@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -59,13 +60,24 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Unauthorized'], 401);
     }
-    public function index($userId)
+    public function index(Request $request, $userId)
     {
-        $event =  Event::join('users', 'users.id', '=', 'events.user_id')
-            ->join('events_categoris', 'events_categoris.id', '=', 'events.categoris_id')
-            ->select('events.start_time', 'events.id', 'events.color',  'events.end_time', 'events.name_event', 'events.notes', 'events_categoris.categoris')->where('events.user_id', $userId)
-            ->get();
-        return response()->json(['event' => $event]);
+        try {
+            $categoriId = $request->input('categoriId');
+            $query =  Event::join('users', 'users.id', '=', 'events.user_id')
+                ->join('events_categoris', 'events_categoris.id', '=', 'events.categoris_id')
+                ->select('events.start_time', 'events.id', 'events.color',  'events.end_time', 'events.name_event', 'events.notes', 'events_categoris.categoris')->where('events.user_id', $userId);
+            if (isset($categoriId)) {
+                $query->where('events.categoris_id', $categoriId);
+            }
+            $event = $query->get();
+            return response()->json(['event' => $event]);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Failed to retrieve events',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
     public function checkToken(Request $request)
     {
