@@ -33,23 +33,34 @@
             </div>
         </div>
         <div class="sidebar__label">
-            <span class="sidebar__label-title">Lịch của tôi</span>
+            <div class="sidebar__label-header">
+                <span class="sidebar__label-header__title">Lịch của tôi</span>
+                <font-awesome-icon :icon="['fas', 'chevron-up']" />
+            </div>
             <ul class="sidebar__label-list">
-                <li>
+                <li class="sidebar__label-item">
                     <input
+                        id="event"
                         type="checkbox"
-                        checked
+                        v-model="eventCheck"
                         class="sidebar__label-list__checkbox"
+                        @change="handleCheckBox"
                     />
-                    <i class="sidebar__label-list__item">Sự kiện</i>
+                    <label for="event" class="sidebar__label-list__label"
+                        >Sự kiện</label
+                    >
                 </li>
-                <li>
+                <li class="sidebar__label-item">
                     <input
+                        id="remin"
                         type="checkbox"
-                        checked
+                        v-model="reminCheck"
                         class="sidebar__label-list__checkbox"
+                        @change="handleCheckBox"
                     />
-                    <i class="sidebar__label-list__item">Lời nhắc</i>
+                    <label for="remin" class="sidebar__label-list__label"
+                        >Lời nhắc</label
+                    >
                 </li>
             </ul>
         </div>
@@ -59,7 +70,7 @@
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { defineComponent, ref, watchEffect, onMounted } from "vue";
+import { defineComponent, ref, watchEffect, onMounted, watch } from "vue";
 import {
     useMonth,
     useMenu,
@@ -67,6 +78,7 @@ import {
     useShowModal,
 } from "../../stores/curremtmonth";
 import { storeToRefs } from "pinia";
+import axios from "axios";
 
 export default defineComponent({
     components: {
@@ -74,7 +86,7 @@ export default defineComponent({
     },
     props: {
         dateClick: Function,
-        currentEvents: ref(),
+        id: ref(),
     },
     setup(props, { emit }) {
         const fullCalendar = ref();
@@ -85,12 +97,16 @@ export default defineComponent({
         const useToday = useToDay();
         const today = ref(useToday.today);
         const show = ref(menu.menu);
-        const events = ref(props.currentEvents.value);
         const useModal = useShowModal();
-
+        const id = ref(props.id);
+        const categoriId = ref({
+            categoriId: null,
+        });
+        const eventCheck = ref(true);
+        const reminCheck = ref(true);
         watchEffect(() => {
-            // events.value = props.currentEvents.value;
-            // console.log(events.value);
+            id.value = props.id;
+            console.log("props.id", id.value);
             show.value = menu.menu;
             today.value = useToday.today;
             if (today.value && show.value === false) {
@@ -109,6 +125,65 @@ export default defineComponent({
                 getDate();
             }
         });
+        watch(id, (value) => {
+            if (value !== null) {
+                getAllEvent();
+            }
+        });
+        const handleCheckBox = () => {
+            if (eventCheck.value && reminCheck.value) {
+                getAllEvent();
+            } else if (reminCheck.value) {
+                categoriId.value.categoriId = 2;
+                getEvent(categoriId);
+            } else if (eventCheck.value) {
+                categoriId.value.categoriId = 1;
+                getEvent(categoriId);
+            } else {
+                emit("removeAllEvents");
+            }
+        };
+        const getEvent = async (categori) => {
+            try {
+                if (id.value) {
+                    const res = await axios.post(
+                        `http://127.0.0.1:8000/api/user_event/${id.value}?categoriId=${categori.value.categoriId}`
+                    );
+                    const events = res.data.event.map((item) => ({
+                        id: item.id.toString(),
+                        title: item.name_event,
+                        start: item.start_time,
+                        end: item.end_time,
+                        backgroundColor: item.color ? item.color : "blue", // Màu sự kiện
+                        allDay: item.start_time.includes("T") ? false : true,
+                    }));
+                    emit("addEventSource", events);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        const getAllEvent = async () => {
+            try {
+                if (id.value) {
+                    const res = await axios.post(
+                        `http://127.0.0.1:8000/api/user_event/${id.value}`
+                    );
+                    const events = res.data.event.map((item) => ({
+                        id: item.id.toString(),
+                        title: item.name_event,
+                        start: item.start_time,
+                        end: item.end_time,
+                        backgroundColor: item.color ? item.color : "blue", // Màu sự kiện
+                        allDay: item.start_time.includes("T") ? false : true,
+                    }));
+                    console.log(events);
+                    emit("addEventSource", events);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
         const openModal = () => {
             const show = !useModal.show;
             useModal.onShowModal(show);
@@ -126,7 +201,6 @@ export default defineComponent({
                 getDate();
             }
         };
-
         const getDate = () => {
             if (fullCalendar.value) {
                 currentYear.value = parseInt(
@@ -166,8 +240,10 @@ export default defineComponent({
             goToNextMonth,
             calendarOptions,
             fullCalendar,
-            events,
             openModal,
+            eventCheck,
+            reminCheck,
+            handleCheckBox,
         };
     },
 });

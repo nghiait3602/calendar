@@ -55,12 +55,12 @@ class EventController extends Controller
             'name_event' => 'required|string|max:255',
             'start_time' => 'required',
             'end_time' => 'required',
-            'categoris_id' => 'required',
+
         ]);
         $event->name_event = $request->name_event;
         $event->start_time = $request->start_time;
         $event->end_time = $request->end_time;
-        $event->categoris_id = $request->categoris_id;
+        $event->categoris_id = $event->categoris_id;
         $event->notes = $request->notes;
         $event->color = $request->color;
         $event->save();

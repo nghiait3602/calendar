@@ -13,8 +13,10 @@
         />
         <div class="calendar__main">
             <Sidebar
+                :id="idUser"
                 @dateClick="handleDateClick"
-                :currentEvents="currentEvents"
+                @removeAllEvents="removeAllEvents"
+                @addEventSource="addEventSource"
             />
 
             <div class="calendar__body">
@@ -22,9 +24,9 @@
                 <ModalContainerVue
                     :event="newEvent"
                     :isEdit="isEdit"
+                    @getEventsUser="getEventsUser"
                     @createEvent="createEvent"
                     @update="update"
-                    @getEventsUser="getEventsUser"
                     @deleteEvent="deleteEvent"
                 />
             </div>
@@ -42,6 +44,7 @@ import Header from "../../components/calendar/header.vue";
 import Sidebar from "../../components/calendar/sidebar.vue";
 import ModalContainerVue from "../../components/modal/Modal-container.vue";
 import { useShowModal } from "../../stores/curremtmonth";
+import dayjs from "dayjs";
 
 export default defineComponent({
     components: {
@@ -85,7 +88,6 @@ export default defineComponent({
                         }
                     );
                     email.value = res.data.email;
-                    console.log(res.data.id);
                     idUser.value = res.data.id;
                 } catch (error) {
                     console.log(error);
@@ -93,11 +95,11 @@ export default defineComponent({
             };
             getUser();
         });
-        watch(idUser, (newVal) => {
-            if (newVal !== null) {
-                getEventsUser();
-            }
-        });
+        // watch(idUser, (newVal) => {
+        //     if (newVal !== null) {
+        //         getEventsUser();
+        //     }
+        // });
         const getEventsUser = async () => {
             try {
                 const res = await axios.post(
@@ -116,8 +118,7 @@ export default defineComponent({
                     backgroundColor: item.color ? item.color : "blue", // Màu sự kiện
                     allDay: item.start_time.includes("T") ? false : true,
                 }));
-                fullCalendar.value.getApi().addEventSource(events);
-                currentEvents.value = events;
+                addEventSource(events);
             } catch (error) {
                 console.log(error);
             }
@@ -144,7 +145,9 @@ export default defineComponent({
                 );
                 calendarApi.addEvent(data._rawValue);
                 getEventsUser();
-            } catch (error) {}
+            } catch (error) {
+                console.log(error);
+            }
         };
         const update = async (data) => {
             const temp = {
@@ -152,7 +155,6 @@ export default defineComponent({
                 start_time: data._rawValue.start,
                 end_time: data._rawValue.end,
                 notes: "SInh nhat",
-                categoris_id: 2,
                 color: data._rawValue.backgroundColor,
             };
             try {
@@ -165,7 +167,56 @@ export default defineComponent({
                         },
                     }
                 );
-            } catch (error) {}
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        const updateEventDropTable = async (data) => {
+            const today = new Date(data.event._instance.range.start);
+            const startDate = dayjs(
+                new Date(data.event._instance.range.start)
+            ).format("YYYY-MM-DD");
+            const endDate = dayjs(
+                new Date(data.event._instance.range.end)
+            ).format("YYYY-MM-DD");
+            const newEndDate = ref();
+            const newStartDate = ref();
+            if (endDate === startDate) {
+                newStartDate.value = dayjs(
+                    new Date(data.event._instance.range.start)
+                )
+                    .set("hours", today.getHours())
+                    .format("YYYY-MM-DDTHH:mm:ss");
+                newEndDate.value = dayjs(
+                    new Date(data.event._instance.range.start)
+                )
+                    .set("hours", today.getHours())
+                    .format("YYYY-MM-DDTHH:mm:ss");
+            } else {
+                newEndDate.value = endDate;
+                newStartDate.value = startDate;
+            }
+            const temp = {
+                name_event: data.event._def.title,
+                start_time: newStartDate.value,
+                end_time: newEndDate.value,
+                notes: "SInh nhat",
+                color: data.event._def.ui.backgroundColor,
+            };
+            try {
+                const res = await axios.put(
+                    `http://127.0.0.1:8000/api/event_update/${data.event._def.publicId}`,
+                    temp,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+                console.log(res);
+            } catch (error) {
+                console.log(error);
+            }
         };
         const deleteEvent = async (data) => {
             try {
@@ -185,6 +236,15 @@ export default defineComponent({
             }
         });
 
+        //
+        const removeAllEvents = () => {
+            fullCalendar.value.getApi().removeAllEvents();
+        };
+        const addEventSource = (events) => {
+            fullCalendar.value.getApi().removeAllEvents();
+            fullCalendar.value.getApi().addEventSource(events);
+            currentEvents.value = events;
+        };
         // handler Calendar
         const goToPrev = () => {
             if (fullCalendar.value) {
@@ -206,7 +266,6 @@ export default defineComponent({
         };
         const handleShowMenu = () => {
             setTimeout(() => {
-                console.log("handleShowMenu");
                 fullCalendar.value.getApi().render();
             }, 500);
         };
@@ -243,13 +302,11 @@ export default defineComponent({
                     categoris_id: "",
                     user_id: idUser.value,
                 };
-                console.log(selectInfo.startStr, selectInfo.endStr);
                 // calendarApi.addEvent(newEvent);
             }
         };
         // click để xóa sự kiện
         const handleEventClick = (clickInfo) => {
-            console.log(clickInfo);
             showModal.show = !showModal.show;
             newEvent.value = {
                 id: clickInfo.event._def.publicId, // Unique ID
@@ -265,6 +322,9 @@ export default defineComponent({
         const handleEvents = (events) => {
             currentEvents.value = events;
         };
+        const handleDropEvent = (info) => {
+            updateEventDropTable(info);
+        };
         ///chuyển ngày theo calendar sidebar
         const handleDateClick = (date) => {
             fullCalendar.value.getApi().gotoDate(date);
@@ -278,13 +338,14 @@ export default defineComponent({
             },
             locale: "vi",
             initialView: "dayGridMonth",
-            editable: false,
+            editable: true,
             selectable: true,
             selectMirror: true,
             dayMaxEvents: true,
             weekends: true,
             select: handleDateSelect,
             eventClick: handleEventClick,
+            eventDrop: handleDropEvent,
         };
 
         return {
@@ -307,6 +368,9 @@ export default defineComponent({
             update,
             deleteEvent,
             handleShowMenu,
+            addEventSource,
+            idUser,
+            removeAllEvents,
         };
     },
 });

@@ -13,24 +13,26 @@
             </div>
             <span class="header__title">Lịch</span>
             <div class="header__btn">
-                <button
-                    class="header__button header__button-today"
-                    @click="goToToday"
-                >
-                    Hôm nay
-                </button>
-                <button
-                    class="header__button header__button-previous"
-                    @click="goToPreviousMonth"
-                >
-                    &#8249;
-                </button>
-                <button
-                    class="header__button header__button-next"
-                    @click="goToNextMonth"
-                >
-                    &#8250;
-                </button>
+                <div>
+                    <button
+                        class="header__button header__button-today"
+                        @click="goToToday"
+                    >
+                        Hôm nay
+                    </button>
+                    <button
+                        class="header__button header__button-previous"
+                        @click="goToPreviousMonth"
+                    >
+                        <font-awesome-icon :icon="['fas', 'chevron-left']" />
+                    </button>
+                    <button
+                        class="header__button header__button-next"
+                        @click="goToNextMonth"
+                    >
+                        <font-awesome-icon :icon="['fas', 'chevron-right']" />
+                    </button>
+                </div>
                 <span class="header__month">
                     Tháng {{ month + 1 }}, {{ year }}
                 </span>
@@ -90,7 +92,6 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const showLogoutButton = ref(false);
-        const clickToday = ref(false);
         const router = useRouter();
         const stores = useMonth();
         const showMenu = useMenu();

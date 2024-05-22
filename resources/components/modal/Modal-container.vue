@@ -126,7 +126,6 @@ export default {
         isEdit: Boolean,
     },
     setup(props, { emit }) {
-        console.log(props.isEdit);
         const show = useShowModal();
         const showModal = ref(show.show);
         const selectedOption = ref("1");
@@ -148,7 +147,6 @@ export default {
             if (start === end) {
                 selectedOption.value = "2";
                 const day = new Date(props.event.end);
-                console.log(day);
                 eventData.value.start = dayjs(props.event.end)
                     .set("hours", day.getHours())
                     .set("minutes", day.getMinutes())
@@ -180,7 +178,7 @@ export default {
 
         const updateContent = (option) => {
             const today = new Date();
-            console.log(today.getHours() + today.getMinutes());
+            console.log(props.event.start);
             selectedOption.value = option;
             eventData.value.categoris_id = option;
             if (selectedOption.value === "2") {
@@ -206,23 +204,23 @@ export default {
         const create = () => {
             if (props.isEdit) {
                 emit("update", eventData);
-                window.location.reload();
+                // window.location.reload();
+                emit("getEventsUser");
             } else {
                 emit("createEvent", eventData);
+                emit("getEventsUser");
                 console.log(eventData.value);
-                window.location.reload();
+                // window.location.reload();
             }
             closeModal();
         };
         const deleteEvent = () => {
             emit("deleteEvent", eventData);
-            window.location.reload();
+            // window.location.reload();
+            emit("getEventsUser");
             closeModal();
         };
-        const colors = ["red", "blue", "green", "purple", "orange"];
-        const selectColor = (color) => {
-            eventData.value.backgroundColor = color;
-        };
+
         return {
             showModal,
             closeModal,
@@ -231,8 +229,6 @@ export default {
             eventData,
             create,
             deleteEvent,
-            colors,
-            selectColor,
         };
     },
 };
