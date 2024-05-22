@@ -37,32 +37,38 @@
                 <span class="sidebar__label-header__title">Lịch của tôi</span>
                 <font-awesome-icon :icon="['fas', 'chevron-up']" />
             </div>
-            <ul class="sidebar__label-list">
-                <li class="sidebar__label-item">
-                    <input
-                        id="event"
-                        type="checkbox"
-                        v-model="eventCheck"
-                        class="sidebar__label-list__checkbox"
-                        @change="handleCheckBox"
-                    />
-                    <label for="event" class="sidebar__label-list__label"
-                        >Sự kiện</label
-                    >
-                </li>
-                <li class="sidebar__label-item">
-                    <input
-                        id="remin"
-                        type="checkbox"
-                        v-model="reminCheck"
-                        class="sidebar__label-list__checkbox"
-                        @change="handleCheckBox"
-                    />
-                    <label for="remin" class="sidebar__label-list__label"
-                        >Lời nhắc</label
-                    >
-                </li>
-            </ul>
+            <div class="sidebar__label-list">
+                <div>
+                    <label class="sidebar__label-item">
+                        <input
+                            id="event"
+                            type="checkbox"
+                            v-model="eventCheck"
+                            class="sidebar__label-list__checkbox"
+                            @change="handleCheckBox"
+                        />
+                        <div
+                            class="checkbox__checkmark checkbox__checkmark-event"
+                        ></div>
+                        <div class="sidebar__label-list__label">Sự kiện</div>
+                    </label>
+                </div>
+                <div>
+                    <label class="sidebar__label-item">
+                        <input
+                            id="remin"
+                            type="checkbox"
+                            v-model="reminCheck"
+                            class="sidebar__label-list__checkbox"
+                            @change="handleCheckBox"
+                        />
+                        <div
+                            class="checkbox__checkmark checkbox__checkmark-remin"
+                        ></div>
+                        <div class="sidebar__label-list__label">Lời nhắc</div>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -106,7 +112,6 @@ export default defineComponent({
         const reminCheck = ref(true);
         watchEffect(() => {
             id.value = props.id;
-            console.log("props.id", id.value);
             show.value = menu.menu;
             today.value = useToday.today;
             if (today.value && show.value === false) {

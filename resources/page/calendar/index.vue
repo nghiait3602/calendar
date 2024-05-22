@@ -64,13 +64,13 @@ export default defineComponent({
         const showModal = useShowModal();
         const isEdit = ref(false);
         const newEvent = ref({
-            id: "", // Unique ID
+            id: "",
             title: "",
             start: "",
             end: "",
             allDay: "",
-            backgroundColor: "", // đổi màu
-            categoris_id: 1,
+            backgroundColor: "",
+            categoris_id: "",
             user_id: idUser.value,
         });
         watchEffect(() => {
@@ -150,10 +150,30 @@ export default defineComponent({
             }
         };
         const update = async (data) => {
+            const startDate = dayjs(new Date(data._rawValue.start)).format(
+                "YYYY-MM-DD"
+            );
+            const endDate = dayjs(new Date(data._rawValue.end)).format(
+                "YYYY-MM-DD"
+            );
+            const newEndDate = ref();
+            const newStartDate = ref();
+            if (endDate === startDate) {
+                newStartDate.value = dayjs(
+                    new Date(data._rawValue.start)
+                ).format("YYYY-MM-DDTHH:mm:ss");
+                newEndDate.value = dayjs(new Date(data._rawValue.start)).format(
+                    "YYYY-MM-DDTHH:mm:ss"
+                );
+            } else {
+                newEndDate.value = endDate;
+                newStartDate.value = startDate;
+            }
+            console.log("update", data);
             const temp = {
                 name_event: data._rawValue.title,
-                start_time: data._rawValue.start,
-                end_time: data._rawValue.end,
+                start_time: newStartDate.value,
+                end_time: newEndDate.value,
                 notes: "SInh nhat",
                 color: data._rawValue.backgroundColor,
             };
@@ -172,7 +192,6 @@ export default defineComponent({
             }
         };
         const updateEventDropTable = async (data) => {
-            const today = new Date(data.event._instance.range.start);
             const startDate = dayjs(
                 new Date(data.event._instance.range.start)
             ).format("YYYY-MM-DD");
@@ -184,14 +203,10 @@ export default defineComponent({
             if (endDate === startDate) {
                 newStartDate.value = dayjs(
                     new Date(data.event._instance.range.start)
-                )
-                    .set("hours", today.getHours())
-                    .format("YYYY-MM-DDTHH:mm:ss");
+                ).format("YYYY-MM-DDTHH:mm:ss");
                 newEndDate.value = dayjs(
                     new Date(data.event._instance.range.start)
-                )
-                    .set("hours", today.getHours())
-                    .format("YYYY-MM-DDTHH:mm:ss");
+                ).format("YYYY-MM-DDTHH:mm:ss");
             } else {
                 newEndDate.value = endDate;
                 newStartDate.value = startDate;
@@ -317,6 +332,7 @@ export default defineComponent({
                 backgroundColor: clickInfo.event._def.ui.backgroundColor, // đổi màu
                 user_id: idUser.value,
             };
+            console.log("newEvent.value", newEvent.value);
             isEdit.value = true;
         };
         const handleEvents = (events) => {

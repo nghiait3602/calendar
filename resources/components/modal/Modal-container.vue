@@ -77,6 +77,7 @@
                         value="2"
                     />
                     <input
+                        style="display: none"
                         type="datetime-local"
                         v-model="eventData.start"
                         required
@@ -86,7 +87,6 @@
                         type="datetime-local"
                         v-model="eventData.end"
                         required
-                        style="display: none"
                         class="input__group-date"
                     />
                 </div>
@@ -135,50 +135,64 @@ export default {
             start: "",
             end: "",
             allDay: "",
-            backgroundColor: "", // đổi màu
+            backgroundColor: "",
             categoris_id: "",
             user_id: "",
         });
-
         watchEffect(() => {
             showModal.value = show.show;
-            const start = dayjs(props.event.start).format("YYYY-MM-DD");
-            const end = dayjs(props.event.end).format("YYYY-MM-DD");
-            if (start === end) {
-                selectedOption.value = "2";
-                const day = new Date(props.event.end);
-                eventData.value.start = dayjs(props.event.end)
-                    .set("hours", day.getHours())
-                    .set("minutes", day.getMinutes())
-                    .format("YYYY-MM-DDTHH:mm:ss");
-                eventData.value.end = dayjs(props.event.end)
-                    .set("hours", day.getHours())
-                    .set("minutes", day.getMinutes())
-                    .format("YYYY-MM-DDTHH:mm:ss");
-                eventData.value.categoris_id = "2";
+            if (props.isEdit) {
+                const start = dayjs(props.event.start).format("YYYY-MM-DD");
+                const end = dayjs(props.event.end).format("YYYY-MM-DD");
+                if (start === end) {
+                    selectedOption.value = "2";
+                    console.log("selectedOption.value", selectedOption.value);
+                    eventData.value.start = dayjs(props.event.start).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                    );
+                    eventData.value.end = dayjs(props.event.start).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                    );
+                    if (eventData.value.title !== null) {
+                        eventData.value.categoris_id = "2";
+                    }
+                } else {
+                    selectedOption.value = "1";
+                    eventData.value.start = dayjs(props.event.start).format(
+                        "YYYY-MM-DD"
+                    );
+                    eventData.value.end = dayjs(props.event.end).format(
+                        "YYYY-MM-DD"
+                    );
+                    if (eventData.value.title !== null) {
+                        eventData.value.categoris_id = "1";
+                    }
+                }
+                eventData.value = {
+                    ...eventData.value,
+                    id: props.event.id, // Unique ID
+                    title: props.event.title,
+                    allDay: props.event.allDay,
+                    backgroundColor: props.event.backgroundColor, // đổi màu
+                    user_id: props.event.user_id,
+                };
             } else {
+                eventData.value = {
+                    id: "", // Unique ID
+                    title: "",
+                    start: dayjs(props.event.start).format("YYYY-MM-DD"),
+                    end: dayjs(props.event.end).format("YYYY-MM-DD"),
+                    allDay: "",
+                    backgroundColor: "", // đổi màu
+                    categoris_id: "",
+                    user_id: "",
+                };
                 selectedOption.value = "1";
-                eventData.value.start = dayjs(props.event.start).format(
-                    "YYYY-MM-DD"
-                );
-                eventData.value.end = dayjs(props.event.end).format(
-                    "YYYY-MM-DD"
-                );
-                eventData.value.categoris_id = "1";
             }
-            eventData.value = {
-                ...eventData.value,
-                id: props.event.id, // Unique ID
-                title: props.event.title,
-                allDay: props.event.allDay,
-                backgroundColor: props.event.backgroundColor, // đổi màu
-                user_id: props.event.user_id,
-            };
         });
 
         const updateContent = (option) => {
             const today = new Date();
-            console.log(props.event.start);
             selectedOption.value = option;
             eventData.value.categoris_id = option;
             if (selectedOption.value === "2") {
@@ -204,8 +218,8 @@ export default {
         const create = () => {
             if (props.isEdit) {
                 emit("update", eventData);
-                // window.location.reload();
                 emit("getEventsUser");
+                // window.location.reload();
             } else {
                 emit("createEvent", eventData);
                 emit("getEventsUser");
@@ -216,8 +230,8 @@ export default {
         };
         const deleteEvent = () => {
             emit("deleteEvent", eventData);
-            // window.location.reload();
             emit("getEventsUser");
+            window.location.reload();
             closeModal();
         };
 
