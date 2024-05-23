@@ -137,7 +137,7 @@ export default {
             allDay: "",
             backgroundColor: "",
             categoris_id: "",
-            user_id: "",
+            user_id: props.event.user_id,
         });
         watchEffect(() => {
             showModal.value = show.show;
@@ -173,21 +173,41 @@ export default {
                     id: props.event.id, // Unique ID
                     title: props.event.title,
                     allDay: props.event.allDay,
-                    backgroundColor: props.event.backgroundColor, // đổi màu
+                    backgroundColor: props.event.backgroundColor,
                     user_id: props.event.user_id,
                 };
             } else {
-                eventData.value = {
-                    id: "", // Unique ID
-                    title: "",
-                    start: dayjs(props.event.start).format("YYYY-MM-DD"),
-                    end: dayjs(props.event.end).format("YYYY-MM-DD"),
-                    allDay: "",
-                    backgroundColor: "", // đổi màu
-                    categoris_id: "",
-                    user_id: "",
-                };
-                selectedOption.value = "1";
+                const start = dayjs(props.event.start).format("YYYY-MM-DD");
+                const end = dayjs(props.event.end).format("YYYY-MM-DD");
+                if (start === end) {
+                    eventData.value = {
+                        id: "", // Unique ID
+                        title: "",
+                        start: dayjs(props.event.start).format(
+                            "YYYY-MM-DDTHH:mm:ss"
+                        ),
+                        end: dayjs(props.event.start).format(
+                            "YYYY-MM-DDTHH:mm:ss"
+                        ),
+                        allDay: "",
+                        backgroundColor: "",
+                        categoris_id: 2,
+                        user_id: props.event.user_id,
+                    };
+                    selectedOption.value = "2";
+                } else {
+                    eventData.value = {
+                        id: "",
+                        title: "",
+                        start: dayjs(props.event.start).format("YYYY-MM-DD"),
+                        end: dayjs(props.event.end).format("YYYY-MM-DD"),
+                        allDay: "",
+                        backgroundColor: "",
+                        categoris_id: 1,
+                        user_id: props.event.user_id,
+                    };
+                    selectedOption.value = "1";
+                }
             }
         });
 
@@ -218,8 +238,8 @@ export default {
         const create = () => {
             if (props.isEdit) {
                 emit("update", eventData);
+                window.location.reload();
                 emit("getEventsUser");
-                // window.location.reload();
             } else {
                 emit("createEvent", eventData);
                 emit("getEventsUser");

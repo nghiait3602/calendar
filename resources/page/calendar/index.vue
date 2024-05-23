@@ -66,11 +66,11 @@ export default defineComponent({
         const newEvent = ref({
             id: "",
             title: "",
-            start: "",
-            end: "",
+            start: dayjs(new Date()).format("YYYY-MM-DD"),
+            end: dayjs().add(1, "day").format("YYYY-MM-DD"),
             allDay: "",
             backgroundColor: "",
-            categoris_id: "",
+            categoris_id: 1,
             user_id: idUser.value,
         });
         watchEffect(() => {
@@ -124,6 +124,7 @@ export default defineComponent({
             }
         };
         const createEvent = async (data) => {
+            console.log("data", data);
             const temp = {
                 name_event: data._rawValue.title,
                 start_time: data._rawValue.start,
@@ -314,7 +315,7 @@ export default defineComponent({
                     end: selectInfo.endStr,
                     allDay: selectInfo.allDay,
                     backgroundColor: "green", // đổi màu
-                    categoris_id: "",
+                    categoris_id: 1,
                     user_id: idUser.value,
                 };
                 // calendarApi.addEvent(newEvent);
